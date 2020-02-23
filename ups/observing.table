@@ -1,0 +1,6 @@
+setupRequired(daf_persistence)
+setupRequired(geom)
+setupRequired(afw)
+print(stdwarn, setupRequired(ts_standardscripts))
+
+envPrepend(PYTHONPATH, ${PRODUCT_DIR}/python)

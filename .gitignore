@@ -1,0 +1,13 @@
+_build.*
+.coverage
+*.pyc
+.sconf_temp
+.sconsign.dblite
+config.log
+doc/*.tag
+doc/html
+doc/xml
+doc/doxygen.conf
+python/lsst/observing/version.py
+tests/.tests
+ups/*.cfgc
