@@ -6,6 +6,7 @@ plateScale = 0.101              # exp.getWcs().getPixelScale().asArcseconds()  #
 boreSight = PointD(2036.5, 2000.5)    # boreSight on detector (pixels)
 sweetSpots = {                  # the sweet spots for the gratings (pixels)
     'ronchi90lpmm' : PointD(1780, 1800),
+    'empty_1' : PointD(1780, 1800)
 }
 gratingOffsets = {              # image motion when we insert a grating (pixels)
     'empty_1' : ExtentD(0, 0),
