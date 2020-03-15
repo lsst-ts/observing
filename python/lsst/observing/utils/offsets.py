@@ -58,6 +58,7 @@ async def findOffsetsAndMove(
     try:
         cx, cy = centroid
         peakVal = exp.image[int(cx), int(cy)]
+        print('Centroid of target in pixels is [cx,cy] = [{},{}]'.format(cx,cy))
     except Exception as e:
         print(f"Failed to get peak value ({e})")
         peakVal = None

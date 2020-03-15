@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import numpy as np
 
 import lsst.observing.utils.focus
 from lsst.observing.constants import (boreSight, sweetSpots)
@@ -129,14 +130,30 @@ async def takeData(attcs,
 
     if doPointingModel:
         targetPosition = boreSight
+        # Iterate to put star on boresight
+        success=False
+        for i in range(5):
 
-        retvals = await asyncio.gather(
-            findOffsetsAndMove(attcs, targetPosition, latiss, dataId=None, butler=butler,
-                               doMove=True, alwaysAcceptMove=alwaysAcceptMove),
-            latiss.take_object(exptime=expTime0, n=1),
-        )
-        exp, dx, dy, peakVal = retvals[0]
+             retvals = await asyncio.gather(
+                 findOffsetsAndMove(attcs, targetPosition, latiss, dataId=None, butler=butler,
+                                    doMove=True, alwaysAcceptMove=alwaysAcceptMove),
+                 latiss.take_object(exptime=expTime0, n=1),
+             )
+             exp, dx, dy, peakVal = retvals[0]
+             print('Calculated offsets [dx,dy] are [{},{}]'.format(dx,dy))
 
+             dr=np.sqrt(dx**2.0+dy**2.0)
+             print('Current radial pointing error is {}'.format(dr))
+             if dr < 2.0:
+                  success=True
+                  break
+        
+        if success:
+             print('Achieved Centering accuracy')
+        else:
+             print('Failed to center star on boresight')
+             return
+        
         if not silent:
             playSound()
 
@@ -149,8 +166,10 @@ async def takeData(attcs,
         #
         # Update pointing model
         #
-        await attcs.atptg.cmd_pointAddData.start()
+        print('Adding datapoint to pointing model')
+        await attcs.add_point_data()
 
+        return # this skips the acquisition below
     #
     # Done with pointing model.
     # 
