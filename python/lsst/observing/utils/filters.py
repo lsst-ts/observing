@@ -3,6 +3,7 @@ from lsst.observing.constants import dFocusDthickness, glassThicknesses, plateSc
 
 __all__ = ["getFilterAndGrating", "changeFilterAndGrating"]
 
+
 async def getFilterAndGrating(latiss):
     """Return the current filter and grating"""
     filter_pos = await latiss.atspectrograph.evt_reportedFilterPosition.aget()
@@ -13,24 +14,20 @@ async def getFilterAndGrating(latiss):
 
 async def changeFilterAndGrating(attcs, latiss, filter=None, grating=None):
     """Insert filter and/or grating leaving the stars at the same place and focus"""
-    
+
     currentFilter, currentGrating = await getFilterAndGrating(latiss)
     if filter is None:
         filter = currentFilter
     if grating is None:
         grating = currentGrating
 
-    focus_offset = dFocusDthickness*((glassThicknesses[filter]  - glassThicknesses[currentFilter]) + 
+    focus_offset = dFocusDthickness*((glassThicknesses[filter] - glassThicknesses[currentFilter]) +
                                      (glassThicknesses[grating] - glassThicknesses[currentGrating]))
-    
-    dx, dy = plateScale*(gratingOffsets[grating] - gratingOffsets[currentGrating])
-    
-    import lsst.observing.utils.focus  # HACK: save this value as we can't (yet) get it from the telescope
-    focus_offset += lsst.observing.utils.focus.myFocusOffset
 
+    dx, dy = plateScale*(gratingOffsets[grating] - gratingOffsets[currentGrating])
 
     attcs.athexapod.evt_positionUpdate.flush()
-    print(f'Applying focus offset of {focus_offset} for filter {filter} and grating {grating}')    
+    print(f'Applying focus offset of {focus_offset} for filter {filter} and grating {grating}')
     await attcs.ataos.cmd_offset.set_start(z=focus_offset)
 
     if False:
@@ -43,7 +40,5 @@ async def changeFilterAndGrating(attcs, latiss, filter=None, grating=None):
         latiss.setup_atspec(filter=filter, grating=grating),
         attcs.offset_xy(dx, dy, persistent=True),
     )
-
-    lsst.observing.utils.focus.myFocusOffset = focus_offset
 
     return filter, grating
