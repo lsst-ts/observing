@@ -22,6 +22,7 @@ async def changeFilterAndGrating(attcs, latiss, filter=None, grating=None):
 
     focus_offset = dFocusDthickness*((glassThicknesses[filter]  - glassThicknesses[currentFilter]) + 
                                      (glassThicknesses[grating] - glassThicknesses[currentGrating]))
+    
     dx, dy = plateScale*(gratingOffsets[grating] - gratingOffsets[currentGrating])
     
     import lsst.observing.utils.focus  # HACK: save this value as we can't (yet) get it from the telescope
@@ -30,7 +31,7 @@ async def changeFilterAndGrating(attcs, latiss, filter=None, grating=None):
 
     attcs.athexapod.evt_positionUpdate.flush()
         
-    await attcs.ataos.cmd_applyFocusOffset.set_start(offset=focus_offset)
+    await attcs.ataos.cmd_offset.set_start(z=focus_offset)
 
     if False:
         evt_positionUpdate = attcs.athexapod.evt_positionUpdate.next(flush=False, timeout=attcs.long_timeout)
