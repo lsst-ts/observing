@@ -30,7 +30,7 @@ async def changeFilterAndGrating(attcs, latiss, filter=None, grating=None):
 
 
     attcs.athexapod.evt_positionUpdate.flush()
-        
+    print(f'Applying focus offset of {focus_offset} for filter {filter} and grating {grating}')    
     await attcs.ataos.cmd_offset.set_start(z=focus_offset)
 
     if False:
